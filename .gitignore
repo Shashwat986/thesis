@@ -12,3 +12,6 @@ build/*
 Makefile~
 *.npy
 *.bz2
+
+refactor/files
+refactor/temp_files

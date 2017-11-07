@@ -50,15 +50,15 @@ class VectorAlignment:
     Setting default values for Vector generation
   '''
   def set_default_values(self):
-    self.env['VECTOR_SIZE'] = 50
-    self.env['WINDOW_SIZE'] = 15
-    self.env['VOCAB_MIN_COUNT'] = 5
+    self.env['VECTOR_SIZE'] = '50'
+    self.env['WINDOW_SIZE'] = '15'
+    self.env['VOCAB_MIN_COUNT'] = '5'
 
     for key in ['VECTOR_SIZE', 'WINDOW_SIZE', 'VOCAB_MIN_COUNT']:
       if key in self.options:
         self.env[key] = str(self.options[key])
 
-    self.vector_size = self.env['VECTOR_SIZE']
+    self.vector_size = int(self.env['VECTOR_SIZE'])
 
   '''
     Vector Generation
@@ -118,12 +118,17 @@ class VectorAlignment:
         continue
 
       self.vectors[word] = vector
-      self.words[i] = word
+      try:
+        self.words[i] = word
+      except IndexError:
+        print("Some issue with number of lines.")
+        self.words.append(word)
 
       i += 1
       if i % 1000 == 0: print("{} lines processed".format(i), end="\r")
 
     print("\nLoading done.")
+    f.close()
     self.set_vector_state('loaded')
 
   def get_vector(self, key, Ab = None):

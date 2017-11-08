@@ -9,6 +9,7 @@ SAVE_FILE=files/$2
 : ${WINDOW_SIZE:=15}
 : ${VECTOR_SIZE:=50}
 
+mkdir -p temp_files
 VOCAB_FILE=temp_files/vocab.txt
 COOCCURRENCE_FILE=temp_files/cooccurrence.bin
 COOCCURRENCE_SHUF_FILE=temp_files/cooccurrence.shuf.bin

@@ -108,7 +108,14 @@ class VectorAlignment:
       print("Changing vector_size based on what's written in vectors file: ", dim)
 
     i = 0
-    for line in f:
+    line = " "
+    while line != "":
+      try:
+        line = f.readline()
+      except UnicodeDecodeError:
+        print("Unable to read line. Ignoring one word")
+        continue
+
       split_line = line.strip().split()
       word = "".join(split_line[:-self.vector_size])
       vector = np.fromiter(map(float, split_line[-self.vector_size:]), np.float)
@@ -172,7 +179,7 @@ class VectorAlignment:
       print("Number of aligned words is too low for a solution")
       return False
 
-    def get_lines():
+    def get_lines(aligned_words, self, other):
       for word in aligned_words:
         word_self = None
         word_other = None
@@ -186,7 +193,6 @@ class VectorAlignment:
         else:
           word_self = word
           word_other = word
-
         if word_self in self.vectors and word_other in other.vectors:
           yield word, self.vectors[word_self], other.vectors[word_other]
 
@@ -197,11 +203,12 @@ class VectorAlignment:
     X = np.zeros((dimensions + 1, aligned_words_count))
 
     print("Creating matrix")
-    generator = get_lines()
-    for n in range(aligned_words_count):
-      word, vector_self, vector_other = next(generator)
+    generator = get_lines(aligned_words, self, other)
+    n = 0
+    for word, vector_self, vector_other in generator:
       Y[:, n] = np.append(vector_other, 1)
       X[:, n] = np.append(vector_self, 1)
+      n += 1
 
     print("Matrix Created. Solving")
     gc.collect()
@@ -213,8 +220,8 @@ class VectorAlignment:
     if not np.any(Ab):
       print("There has been some issue with the matrix creation")
 
-    print(Ab.shape)
-    print(np.allclose(np.dot(Ab, X), Y))
+    print("Should be (Vec+1, Vec+1):", Ab.shape)
+    print("Should be True:", np.allclose(np.dot(Ab, X), Y))
 
     return Ab
 
